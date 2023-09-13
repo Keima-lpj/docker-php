@@ -1,0 +1,88 @@
+version: '3'
+# docker build --tag "php:7.4-fpm-withext" -f Dockerfile .
+
+networks:
+  # 配置docker network
+  app_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      config:
+        # 子网络
+        - subnet: 10.10.0.0/16
+
+services:
+
+  nginx:
+    container_name: nginx
+    image: hub.deepin.com/library/nginx:latest
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /home/keima/docker/nginx/conf.d:/etc/nginx/conf.d
+      - /home/keima/docker/nginx/ca:/etc/nginx/ca:ro
+      - /home/keima/www:/home/www
+    networks:
+      app_net:
+        ipv4_address: 10.10.10.3
+
+  php:
+    container_name: php
+    image: php:7.4-fpm-withext
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - 9000:9000
+    volumes:
+      - /home/keima/www:/home/www
+      - /data/home/keima/docker/php/conf/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      app_net:
+        ipv4_address: 10.10.10.4
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    volumes:
+      - /home/keima/docker/mysql/data:/var/lib/mysql
+      - /home/keima/docker/mysql/conf:/etc/mysql/conf.d:ro
+      - /home/keima/docker/mysql/logs:/data/mysql/logs
+    restart: always
+    # 环境变量
+    environment:
+      - TZ=Asia/Shanghai # 设置时区
+      # mysql密码
+      - MYSQL_ROOT_PASSWORD:mysql123456
+    networks:
+      app_net:
+        ipv4_address: 10.10.10.1     
+
+  redis:
+    container_name: redis
+    # 指定镜像
+    image: redis:5
+    restart: always
+    ports:
+    # 端口映射
+      - 6379:6379
+    volumes:
+      # 目录映射
+      - /home/keima/docker/redis/conf:/usr/local/etc/redis:ro
+      - /home/keima/docker/redis/data:/data:ro
+    command:
+      # 执行的命令
+      #redis-server /usr/local/etc/redis/redis.conf --requirepass redis123456
+      redis-server  --requirepass redis123456
+    environment:
+        - TZ=Asia/Shanghai # 设置时区
+    networks:
+      app_net:
+        ipv4_address: 10.10.10.2  
