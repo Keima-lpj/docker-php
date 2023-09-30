@@ -16,7 +16,7 @@ services:
 
   nginx:
     container_name: nginx
-    image: hub.deepin.com/library/nginx:latest
+    image: nginx:latest
     restart: always
     environment:
       TZ: Asia/Shanghai
@@ -33,7 +33,7 @@ services:
 
   php:
     container_name: php
-    image: php:7.4-fpm-withext
+    image: php:7.4-fpm
     restart: always
     environment:
       TZ: Asia/Shanghai
@@ -60,7 +60,7 @@ services:
     environment:
       - TZ=Asia/Shanghai # 设置时区
       # mysql密码
-      - MYSQL_ROOT_PASSWORD:mysql123456
+      - MYSQL_ROOT_PASSWORD=mysql123456
     networks:
       app_net:
         ipv4_address: 10.10.10.1     
@@ -76,7 +76,7 @@ services:
     volumes:
       # 目录映射
       - /home/keima/docker/redis/conf:/usr/local/etc/redis:ro
-      - /home/keima/docker/redis/data:/data:ro
+      - /home/keima/docker/redis/data:/data
     command:
       # 执行的命令
       #redis-server /usr/local/etc/redis/redis.conf --requirepass redis123456
