@@ -21,7 +21,7 @@ services:
     environment:
       TZ: Asia/Shanghai
     ports:
-      - 80:80
+      - 8990:80
       - 443:443
     volumes:
       - /home/keima/docker/nginx/conf.d:/etc/nginx/conf.d
